@@ -332,10 +332,10 @@ def regex_check(printableDiff, commit_time, branch_name, prev_commit, blob, comm
     else:
         secret_regexes = regexes
     regex_matches = []
-    for key in secret_regexes:
-        found_strings = secret_regexes[key].findall(printableDiff)
-        for found_string in found_strings:
-            found_diff = printableDiff.replace(printableDiff, bcolors.WARNING + found_string + bcolors.ENDC)
+    for key in regexes:
+        findings = list(m for m in regexes[key].finditer(printableDiff) if len(m.group()))
+        found_strings = ', '.join(m.group() for m in findings)
+        found_diff = highlight_diff(printableDiff, ((m.start(), m.end()) for m in findings))
         if found_strings:
             foundRegex = {}
             foundRegex['date'] = commit_time
